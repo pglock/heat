@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='heat',
     packages=['heat'],
-    version='0.0.3',
+    version='0.0.4',
     description='A framework for high performance data analytics and machine learning.',
     author='Helmholtz Association',
     author_email='martin.siggel@dlr.de',
