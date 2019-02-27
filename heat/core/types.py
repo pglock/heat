@@ -14,6 +14,7 @@ generic
  |   |   \\-> unsignedinteger      (uintxx)     (kind=B, u)
  |   |         uint8, ubyte
  |   \\-> floating                 (floatxx)    (kind=f)
+ |         float16
  |         float32, float, float_
  |         float64, double         (double)
  \\-> flexible (currently unused, placeholder for characters)
@@ -47,6 +48,7 @@ __all__ = [
     'long',
     'uint8',
     'ubyte',
+    'float16',
     'float32',
     'float',
     'float_',
@@ -175,6 +177,12 @@ class floating(number):
     pass
 
 
+class float16(floating):
+    @classmethod
+    def torch_type(cls):
+        return torch.float16
+
+
 class float32(floating):
     @classmethod
     def torch_type(cls):
@@ -224,6 +232,7 @@ __type_mappings = {
     'B':            uint8,
     'u':            uint8,
     'u1':           uint8,
+    'f2':           float16,
     'f':            float32,
     'f4':           float32,
     'f8':           float64,
@@ -235,6 +244,7 @@ __type_mappings = {
     np.int16:       int16,
     np.int32:       int32,
     np.int64:       int64,
+    np.float16:     float16,
     np.float32:     float32,
     np.float64:     float64,
 
@@ -244,6 +254,7 @@ __type_mappings = {
     torch.int16:    int16,
     torch.int32:    int32,
     torch.int64:    int64,
+    torch.float16:  float16,
     torch.float32:  float32,
     torch.float64:  float64,
 
@@ -338,35 +349,38 @@ __type_codes = collections.OrderedDict([
     (int16,   3),
     (int32,   4),
     (int64,   5),
-    (float32, 6),
-    (float64, 7),
+    (float16, 6),
+    (float32, 7),
+    (float64, 8),
 ])
 
 # safe cast table
 __safe_cast = [
-    # bool  uint8  int8   int16  int32  int64  float32 float64
-    [True,  True,  True,  True,  True,  True,  True,   True],  # bool
-    [False, True,  False, True,  True,  True,  True,   True],  # uint8
-    [False, False, True,  True,  True,  True,  True,   True],  # int8
-    [False, False, False, True,  True,  True,  True,   True],  # int16
-    [False, False, False, False, True,  True,  False,  True],  # int32
-    [False, False, False, False, False, True,  False,  True],  # int64
-    [False, False, False, False, False, False, True,   True],  # float32
-    [False, False, False, False, False, False, False,  True]   # float64
+    # bool  uint8  int8   int16  int32  int64  float16  float32 float64
+    [True,  True,  True,  True,  True,  True,  True,    True,   True],  # bool
+    [False, True,  False, True,  True,  True,  True,    True,   True],  # uint8
+    [False, False, True,  True,  True,  True,  True,    True,   True],  # int8
+    [False, False, False, True,  True,  True,  False,   True,   True],  # int16
+    [False, False, False, False, True,  True,  False,   False,  True],  # int32
+    [False, False, False, False, False, True,  False,   False,  True],  # int64
+    [False, False, False, False, False, False, True,    True,   True],  # float16
+    [False, False, False, False, False, False, False,   True,   True],  # float32
+    [False, False, False, False, False, False, False,   False,  True]   # float64
 ]
 
 
 # same kind table
 __same_kind = [
-    # bool  uint8  int8   int16  int32  int64  float32 float64
-    [True,  False, False, False, False, False, False,  False],  # bool
-    [False, True,  True,  True,  True,  True,  False,  False],  # uint8
-    [False, True,  True,  True,  True,  True,  False,  False],  # int8
-    [False, True,  True,  True,  True,  True,  False,  False],  # int16
-    [False, True,  True,  True,  True,  True,  False,  False],  # int32
-    [False, True,  True,  True,  True,  True,  False,  False],  # int64
-    [False, False, False, False, False, False, True,   True],   # float32
-    [False, False, False, False, False, False, True,   True]    # float64
+    # bool  uint8  int8   int16  int32  int64  float16  float32 float64
+    [True,  False, False, False, False, False, False,   False,  False],  # bool
+    [False, True,  True,  True,  True,  True,  False,   False,  False],  # uint8
+    [False, True,  True,  True,  True,  True,  False,   False,  False],  # int8
+    [False, True,  True,  True,  True,  True,  False,   False,  False],  # int16
+    [False, True,  True,  True,  True,  True,  False,   False,  False],  # int32
+    [False, True,  True,  True,  True,  True,  False,   False,  False],  # int64
+    [False, False, False, False, False, False, True,    True,   True],   # float16
+    [False, False, False, False, False, False, True,    True,   True],   # float32
+    [False, False, False, False, False, False, True,    True,   True]    # float64
 ]
 
 

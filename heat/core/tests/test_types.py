@@ -83,6 +83,9 @@ class TestTypes(unittest.TestCase):
     def test_floating(self):
         self.assert_non_instantiable_heat_type(ht.floating)
 
+    def test_float16(self):
+        self.assert_is_instantiable_heat_type(ht.float16, torch.float16)
+
     def test_float32(self):
         self.assert_is_instantiable_heat_type(ht.float32, torch.float32)
         self.assert_is_instantiable_heat_type(ht.float, torch.float32)
@@ -115,6 +118,9 @@ class TestTypeConversion(unittest.TestCase):
         self.assertFalse(ht.can_cast(ht.float64, ht.bool, casting='safe'))
         self.assertTrue(ht.can_cast(1.0, ht.float32, casting='safe'))
         self.assertTrue(ht.can_cast(zeros_array, ht.float32, casting='safe'))
+        self.assertTrue(ht.can_cast(ht.float16, ht.float32, casting='safe'))
+        self.assertTrue(ht.can_cast(ht.float16, ht.float64, casting='safe'))
+        self.assertFalse(ht.can_cast(ht.float32, ht.float16, casting='safe'))
 
         # casting - 'same_kind'
         self.assertTrue(ht.can_cast(ht.uint8, ht.uint8, casting='same_kind'))
@@ -131,6 +137,7 @@ class TestTypeConversion(unittest.TestCase):
         self.assertTrue(ht.can_cast(ht.float64, ht.bool, casting='unsafe'))
         self.assertTrue(ht.can_cast(1.0, ht.float32, casting='unsafe'))
         self.assertTrue(ht.can_cast(zeros_array, ht.float32, casting='unsafe'))
+        self.assertTrue(ht.can_cast(ht.float16, ht.int16, casting='unsafe'))
 
         # exceptions
         with self.assertRaises(TypeError):
